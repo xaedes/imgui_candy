@@ -35,7 +35,7 @@ bool ImGuiSliderScalarN(const char* label, T* p_data, int components, const void
 template<typename T>
 bool ImGuiSliderScalarN(const char* label, T* p_data, int components, T p_min, T p_max, const char* format = NULL, ImGuiSliderFlags flags = 0)
 {
-    return ImGuiSliderScalarN(label, p_data, &p_min, &p_max, format, flags);
+    return ImGuiSliderScalarN(label, p_data, components, &p_min, &p_max, format, flags);
 }
 
 inline bool ImGuiButton(const char* label, bool enabled = true, const ImVec2& size = ImVec2(0, 0))
