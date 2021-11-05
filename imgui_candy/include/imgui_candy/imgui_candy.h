@@ -1,5 +1,9 @@
 #pragma once
 
+#include <string>
+#include <sstream>
+#include <iomanip>
+
 template<class U>
 struct ImGuiDataTypeOfPtr_
 {
@@ -61,3 +65,17 @@ void ImGuiText(const std::string& str, Args&&... args)
     ImGui::Text(str.c_str(), std::forward<Args>(args)...);
 }
 
+namespace ImGuiCandy {
+
+template <class T>
+std::string append_id(const std::string& label, const T* ptr)
+{
+    static std::stringstream ss;
+    ss.str("");
+    // const void* ptr = &value;
+    ss << label << "##";
+    ss << "0x" << std::uppercase << std::setfill('0') << std::setw(sizeof(ptr)*2) << std::hex << ptr;
+    return ss.str();
+}
+
+}
