@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <sstream>
 #include <iomanip>
 
@@ -40,6 +41,76 @@ template<typename T>
 bool ImGuiSliderScalarN(const char* label, T* p_data, int components, T p_min, T p_max, const char* format = NULL, ImGuiSliderFlags flags = 0)
 {
     return ImGuiSliderScalarN(label, p_data, components, &p_min, &p_max, format, flags);
+}
+
+template<typename T, typename F>
+bool ImGuiSliderScaledScalar(const char* label, T* p_data, F scale, const void* p_scaled_min, const void* p_scaled_max, const char* format = NULL, ImGuiSliderFlags flags = 0)
+{
+    F scaled_data = (*p_data) / (scale);
+    bool changed = ImGui::SliderScalar(label, ImGuiDataTypeOfPtr_<F>()(&scaled_data), &scaled_data, p_scaled_min, p_scaled_max, format, flags);
+    if (changed)
+    {
+        *p_data = static_cast<T>(scaled_data * scale);
+    }
+    return changed;
+}
+template<typename T, typename F>
+bool ImGuiSliderScaledScalar(const char* label, T* p_data, F scale, F p_scaled_min, F p_scaled_max, const char* format = NULL, ImGuiSliderFlags flags = 0)
+{
+    return ImGuiSliderScaledScalar(label, p_data, scale, &p_scaled_min, &p_scaled_max, format, flags);
+}
+
+template<typename T, typename F>
+bool ImGuiSliderScaledScalarN(const char* label, T* p_data, int components, const F scale, const void* p_scaled_min, const void* p_scaled_max, const char* format = NULL, ImGuiSliderFlags flags = 0)
+{
+    static thread_local std::vector<F> scaled_data;
+    scaled_data.clear();
+    for (int i=0; i<components; ++i)
+    {
+        scaled_data.push_back(p_data[i] / scale);
+    }
+    F* p_scaled = &scaled_data[0];
+
+    bool changed = ImGui::SliderScalarN(label, ImGuiDataTypeOfPtr_<F>()(p_scaled), p_scaled, components, p_scaled_min, p_scaled_max, format, flags);
+    if (changed)
+    {
+        for (int i=0; i<components; ++i)
+        {
+            p_data[i] = static_cast<T>(scaled_data[i] * scale);
+        }
+    }
+}
+template<typename T, typename F>
+bool ImGuiSliderScaledScalarN(const char* label, T* p_data, int components, F scale, T p_min, T p_max, const char* format = NULL, ImGuiSliderFlags flags = 0)
+{
+    return ImGuiSliderScaledScalarN(label, p_data, components, scale, &p_min, &p_max, format, flags);
+}
+
+template<typename T, typename F>
+bool ImGuiSliderScaledScalarN(const char* label, T* p_data, int components, const F* scale, const void* p_scaled_min, const void* p_scaled_max, const char* format = NULL, ImGuiSliderFlags flags = 0)
+{
+    static thread_local std::vector<F> scaled_data;
+    scaled_data.clear();
+    for (int i=0; i<components; ++i)
+    {
+        scaled_data.push_back(p_data[i] / scale[i]);
+    }
+    F* p_scaled = &scaled_data[0];
+
+    bool changed = ImGui::SliderScalarN(label, ImGuiDataTypeOfPtr_<F>()(p_scaled), p_scaled, components, p_scaled_min, p_scaled_max, format, flags);
+    if (changed)
+    {
+        for (int i=0; i<components; ++i)
+        {
+            p_data[i] = static_cast<T>(scaled_data[i] * scale[i]);
+        }
+    }
+    return changed;
+}
+template<typename T, typename F>
+bool ImGuiSliderScaledScalarN(const char* label, T* p_data, int components, F* scale, T p_min, T p_max, const char* format = NULL, ImGuiSliderFlags flags = 0)
+{
+    return ImGuiSliderScaledScalarN(label, p_data, components, scale, &p_min, &p_max, format, flags);
 }
 
 inline bool ImGuiButton(const char* label, bool enabled = true, const ImVec2& size = ImVec2(0, 0))
