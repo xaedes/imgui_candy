@@ -5,6 +5,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include <imgui.h>
+
 struct ImGuiDataTypeOfPtr
 {
     static ImGuiDataType Call( int8_t*   val ) { return ImGuiDataType_S8;     }
@@ -144,16 +146,19 @@ bool ImGuiSliderScaledScalarN(const char* label, T* p_data, int components, F* s
 inline bool ImGuiButton(const char* label, bool enabled = true, const ImVec2& size = ImVec2(0, 0))
 {
     // https://github.com/ocornut/imgui/issues/1889#issuecomment-398681105
+    // https://github.com/ocornut/imgui/issues/211
     if (!enabled)
     {
-        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+        // ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+        // ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+        ImGui::BeginDisabled();
     }
     bool result = ImGui::Button(label, size);
     if (!enabled)
     {
-        ImGui::PopItemFlag();
-        ImGui::PopStyleVar();
+        // ImGui::PopItemFlag();
+        // ImGui::PopStyleVar();
+        ImGui::EndDisabled();
     }
     return result;
 }
